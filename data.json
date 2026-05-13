@@ -1,0 +1,70 @@
+{
+  "mod": {
+    "name": "KaktaMod",
+    "accent_color": "#4ade80"
+  },
+  "sections": [
+    {
+      "id": "accueil",
+      "label": "Accueil",
+      "icon": "🏠",
+      "intro": "Bienvenue sur le wiki officiel de KaktaMod.",
+      "features": [
+        {
+          "icon": "📖",
+          "title": "Présentation",
+          "description": "Découvre ce qu'est KaktaMod et ce qu'il apporte."
+        },
+        {
+          "icon": "⌨️",
+          "title": "Commandes",
+          "description": "Liste complète de toutes les commandes disponibles."
+        },
+        {
+          "icon": "⚙️",
+          "title": "Fonctionnalités",
+          "description": "Tout ce que le mod ajoute au jeu."
+        },
+        {
+          "icon": "❓",
+          "title": "FAQ",
+          "description": "Réponses aux questions les plus fréquentes."
+        }
+      ]
+    },
+    {
+      "id": "presentation",
+      "label": "Présentation",
+      "icon": "📖",
+      "intro": "Qu'est-ce que KaktaMod ?",
+      "content": "Écris ici la présentation de ton mod.\n\nTu peux sauter des lignes, tout s'affiche tel quel."
+    },
+    {
+      "id": "commandes",
+      "label": "Commandes",
+      "icon": "⌨️",
+      "intro": "Toutes les commandes disponibles dans KaktaMod.",
+      "commands": [
+        {
+          "name": "/katamod",
+          "description": "Écris ici ce que fait cette commande."
+        },
+        {
+          "name": "/kataweb",
+          "description": "Affiche le lien vers ce wiki dans le chat."
+        },
+        {
+          "name": "/katashop lancer",
+          "description": "Écris ici ce que fait cette commande."
+        }
+      ]
+    },
+    {
+      "id": "fonctionnalites",
+      "label": "Fonctionnalités",
+      "icon": "⚙️",
+      "intro": "Ce que KaktaMod ajoute à ton expérience de jeu.",
+      "content": "Décris ici les fonctionnalités du mod."
+    }
+  ]
+}
