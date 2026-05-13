@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KaktaMod — Wiki</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:     #0d1117;
+      --bg2:    #161b27;
+      --bg3:    #1e2535;
+      --accent: #4ade80;
+      --text:   #e2e8f0;
+      --text2:  #8b97b0;
+      --border: rgba(255,255,255,0.07);
+      --hover:  rgba(255,255,255,0.04);
+      --sidebar:240px;
+      --radius: 10px;
+    }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex; flex-direction: column; min-height: 100vh;
+    }
+ 
+    /* ── LOGIN SCREEN ── */
+    #login-screen {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 999;
+    }
+    .login-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 44px;
+      width: 380px;
+      text-align: center;
+    }
+    .login-icon {
+      font-size: 42px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .login-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .login-title span { color: var(--accent); }
+    .login-sub {
+      font-size: 13.5px;
+      color: var(--text2);
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+    .login-input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 14px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s;
+      font-family: inherit;
+      margin-bottom: 12px;
+    }
+    .login-input:focus { border-color: rgba(74,222,128,0.4); }
+    .login-input::placeholder { color: var(--text2); }
+    .login-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #0d1117;
+      border: none;
+      border-radius: 8px;
+      padding: 11px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      font-family: inherit;
+    }
+    .login-btn:hover { opacity: 0.88; }
+    .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .login-error {
+      display: none;
+      margin-top: 14px;
+      background: rgba(248,113,113,0.08);
+      border: 1px solid rgba(248,113,113,0.25);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #fca5a5;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .login-error.visible { display: block; }
+    .login-checking {
+      display: none;
+      margin-top: 14px;
+      color: var(--text2);
+      font-size: 13px;
+    }
+    .login-checking.visible { display: block; }
+ 
+    /* ── HEADER ── */
+    header {
+      height: 54px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 24px; gap: 12px;
+      position: sticky; top: 0; z-index: 100;
+      flex-shrink: 0;
+    }
+    .header-logo {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .header-title { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+    .header-title span { color: var(--accent); }
+    .header-badge {
+      font-size: 11px;
+      background: rgba(74,222,128,0.1);
+      color: var(--accent);
+      padding: 2px 9px; border-radius: 20px;
+      border: 1px solid rgba(74,222,128,0.22);
+    }
+    .header-user {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--text2);
+      display: flex; align-items: center; gap: 7px;
+    }
+    .header-user-dot {
+      width: 7px; height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+ 
+    /* ── LAYOUT ── */
+    .layout { display: flex; flex: 1; overflow: hidden; height: calc(100vh - 54px); }
+ 
+    /* ── SIDEBAR ── */
+    aside {
+      width: var(--sidebar);
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      overflow-y: auto; flex-shrink: 0;
+      padding: 16px 0 32px;
+    }
+    aside::-webkit-scrollbar { width: 3px; }
+    aside::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+    .nav-label {
+      padding: 16px 18px 6px;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text2);
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 8px 18px;
+      cursor: pointer; font-size: 13.5px; color: var(--text2);
+      border-left: 2px solid transparent;
+      transition: all 0.13s; user-select: none;
+    }
+    .nav-item:hover { background: var(--hover); color: var(--text); }
+    .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(74,222,128,0.07); }
+    .nav-icon { font-size: 15px; line-height: 1; }
+ 
+    /* ── MAIN ── */
+    main { flex: 1; overflow-y: auto; padding: 44px 52px; }
+    main::-webkit-scrollbar { width: 4px; }
+    main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+ 
+    .page { display: none; }
+    .page.active { display: block; animation: fadein 0.16s ease; }
+    @keyframes fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+ 
+    .page-header { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+    .page-icon { font-size: 30px; line-height: 1; }
+    .page-title { font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+    .page-intro {
+      color: var(--text2); font-size: 14.5px; line-height: 1.75;
+      margin-bottom: 34px; padding-bottom: 26px;
+      border-bottom: 1px solid var(--border);
+    }
+    .content-text { color: var(--text2); font-size: 15px; line-height: 1.9; white-space: pre-wrap; max-width: 720px; }
+    .block-title {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.09em; color: var(--text2);
+      margin: 32px 0 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .block-title::before { content:''; display:block; width:3px; height:13px; background:var(--accent); border-radius:2px; }
+ 
+    .cmd-list { display: flex; flex-direction: column; gap: 8px; max-width: 760px; }
+    .cmd-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 18px;
+      display: flex; gap: 20px; align-items: flex-start;
+      transition: border-color 0.13s;
+    }
+    .cmd-card:hover { border-color: rgba(74,222,128,0.22); }
+    .cmd-name {
+      font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+      font-size: 13px; color: var(--accent);
+      background: rgba(74,222,128,0.08);
+      border: 1px solid rgba(74,222,128,0.18);
+      padding: 4px 12px; border-radius: 6px;
+      white-space: nowrap; min-width: 170px;
+      text-align: center; flex-shrink: 0;
+    }
+    .cmd-desc { color: var(--text2); font-size: 14px; line-height: 1.65; padding-top: 3px; }
+ 
+    .faq-list { display: flex; flex-direction: column; gap: 8px; max-width: 720px; }
+    .faq-item { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .faq-q {
+      padding: 14px 18px; font-size: 14px; font-weight: 600;
+      cursor: pointer; display: flex; justify-content: space-between;
+      align-items: center; user-select: none; transition: color 0.13s; gap: 12px;
+    }
+    .faq-q:hover, .faq-item.open .faq-q { color: var(--accent); }
+    .faq-arrow { font-size: 11px; color: var(--text2); transition: transform 0.2s; flex-shrink: 0; }
+    .faq-item.open .faq-arrow { transform: rotate(180deg); }
+    .faq-a { display: none; padding: 12px 18px 16px; color: var(--text2); font-size: 14px; line-height: 1.75; border-top: 1px solid var(--border); }
+    .faq-item.open .faq-a { display: block; }
+ 
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); gap: 10px; }
+    .feature-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px 18px;
+      transition: border-color 0.13s, transform 0.13s;
+    }
+    .feature-card:hover { border-color: rgba(74,222,128,0.22); transform: translateY(-2px); }
+    .feature-icon { font-size: 22px; margin-bottom: 10px; }
+    .feature-title { font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+    .feature-desc { font-size: 13px; color: var(--text2); line-height: 1.55; }
+ 
+    .info-box {
+      background: rgba(74,222,128,0.05);
+      border: 1px solid rgba(74,222,128,0.18);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 13px 18px; color: var(--text2);
+      font-size: 14px; line-height: 1.7; margin-top: 28px;
+    }
+  </style>
+</head>
+<body>
+ 
+<!-- ── ÉCRAN DE CONNEXION ── -->
+<div id="login-screen">
+  <div class="login-box">
+    <span class="login-icon">🌵</span>
+    <div class="login-title"><span>Kakta</span>Mod — Wiki</div>
+    <div class="login-sub">Accès réservé aux utilisateurs du mod.<br>Entre ton pseudo Minecraft pour continuer.</div>
+    <input id="login-input" class="login-input" type="text" placeholder="Ton pseudo Minecraft..." autocomplete="off" spellcheck="false"/>
+    <button id="login-btn" class="login-btn" onclick="checkAccess()">Accéder au wiki</button>
+    <div id="login-checking" class="login-checking">⏳ Vérification en cours...</div>
+    <div id="login-error" class="login-error"></div>
+  </div>
+</div>
+ 
+<!-- ── SITE ── -->
+<header style="display:none" id="site-header">
+  <div class="header-logo" id="hlogo">🌵</div>
+  <div class="header-title" id="htitle">Wiki</div>
+  <span class="header-badge" id="hbadge"></span>
+  <div class="header-user">
+    <div class="header-user-dot"></div>
+    <span id="header-username"></span>
+  </div>
+</header>
+ 
+<div class="layout" id="site-layout" style="display:none">
+  <aside id="sidebar">
+    <div class="nav-label">Navigation</div>
+  </aside>
+  <main id="main"></main>
+</div>
+ 
+<script>
+  /* ================================================================
+     🔧 CONFIGURATION — seule chose à modifier
+     ================================================================ */
+  const WHITELIST_URL = 'https://raw.githubusercontent.com/TTarox/KaktAventure/main/whitelist.json';
+  const DATA_URL      = 'https://raw.githubusercontent.com/TTarox/KaktAventure/main/data.json';
+  /* ================================================================ */
+ 
+  const loginInput    = document.getElementById('login-input');
+  const loginBtn      = document.getElementById('login-btn');
+  const loginError    = document.getElementById('login-error');
+  const loginChecking = document.getElementById('login-checking');
+ 
+  loginInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkAccess(); });
+ 
+  async function checkAccess() {
+    const pseudo = loginInput.value.trim();
+    if (!pseudo) { showError('Entre ton pseudo Minecraft.'); return; }
+ 
+    loginBtn.disabled = true;
+    loginError.classList.remove('visible');
+    loginChecking.classList.add('visible');
+ 
+    try {
+      const res = await fetch(WHITELIST_URL + '?_=' + Date.now());
+      if (!res.ok) throw new Error('Impossible de contacter le serveur.');
+      const json = await res.json();
+      const list = (json.users || []).map(u => u.toLowerCase());
+ 
+      if (!list.includes(pseudo.toLowerCase())) {
+        showError('❌ Pseudo non reconnu. Tu dois utiliser le mod pour accéder à ce wiki.');
+        return;
+      }
+ 
+      // ✅ Accès autorisé
+      document.getElementById('header-username').textContent = pseudo;
+      sessionStorage.setItem('kw_user', pseudo);
+      loadWiki();
+ 
+    } catch (err) {
+      showError('Erreur réseau : ' + err.message);
+    }
+  }
+ 
+  function showError(msg) {
+    loginError.textContent = msg;
+    loginError.classList.add('visible');
+    loginChecking.classList.remove('visible');
+    loginBtn.disabled = false;
+  }
+ 
+  async function loadWiki() {
+    try {
+      const res = await fetch(DATA_URL + '?_=' + Date.now());
+      if (!res.ok) throw new Error('Impossible de charger data.json (code ' + res.status + ')');
+      const data = await res.json();
+      buildWiki(data);
+    } catch (err) {
+      loginChecking.classList.remove('visible');
+      showError('Erreur chargement wiki : ' + err.message);
+    }
+  }
+ 
+  function buildWiki(data) {
+    const mod = data.mod || {};
+    if (mod.accent_color) document.documentElement.style.setProperty('--accent', mod.accent_color);
+ 
+    document.getElementById('hlogo').textContent  = mod.icon    || '🌵';
+    document.getElementById('htitle').innerHTML   = '<span>' + xe(mod.name || 'Wiki') + '</span>';
+    document.getElementById('hbadge').textContent = mod.version || '';
+    document.title = (mod.name || 'Wiki') + ' — Wiki';
+ 
+    const sidebar = document.getElementById('sidebar');
+    const main    = document.getElementById('main');
+ 
+    (data.sections || []).forEach((sec, i) => {
+      const nav = document.createElement('div');
+      nav.className  = 'nav-item' + (i === 0 ? ' active' : '');
+      nav.dataset.id = sec.id;
+      nav.innerHTML  = `<span class="nav-icon">${sec.icon || '📄'}</span><span>${xe(sec.label)}</span>`;
+      nav.addEventListener('click', () => showPage(sec.id));
+      sidebar.appendChild(nav);
+ 
+      const page = document.createElement('div');
+      page.className = 'page' + (i === 0 ? ' active' : '');
+      page.id = 'p-' + sec.id;
+ 
+      let h = `<div class="page-header">
+        <span class="page-icon">${sec.icon || '📄'}</span>
+        <h1 class="page-title">${xe(sec.label)}</h1>
+      </div>`;
+ 
+      if (sec.intro)
+        h += `<p class="page-intro">${xe(sec.intro)}</p>`;
+ 
+      if (sec.features && sec.features.length) {
+        h += '<div class="features-grid">';
+        sec.features.forEach(f => {
+          h += `<div class="feature-card">
+            <div class="feature-icon">${f.icon || '▪'}</div>
+            <div class="feature-title">${xe(f.title)}</div>
+            <div class="feature-desc">${xe(f.description)}</div>
+          </div>`;
+        });
+        h += '</div>';
+      }
+ 
+      if (sec.content)
+        h += `<div class="content-text">${xe(sec.content)}</div>`;
+ 
+      if (sec.commands && sec.commands.length) {
+        h += '<div class="block-title">Commandes</div><div class="cmd-list">';
+        sec.commands.forEach(c => {
+          h += `<div class="cmd-card">
+            <div class="cmd-name">${xe(c.name)}</div>
+            <div class="cmd-desc">${xe(c.description)}</div>
+          </div>`;
+        });
+        h += '</div>';
+      }
+ 
+      if (sec.faq && sec.faq.length) {
+        h += '<div class="block-title">Questions fréquentes</div><div class="faq-list">';
+        sec.faq.forEach((item, fi) => {
+          const fid = 'faq-' + sec.id + '-' + fi;
+          h += `<div class="faq-item" id="${fid}">
+            <div class="faq-q" onclick="toggleFaq('${fid}')">
+              <span>${xe(item.question)}</span>
+              <span class="faq-arrow">▼</span>
+            </div>
+            <div class="faq-a">${xe(item.answer)}</div>
+          </div>`;
+        });
+        h += '</div>';
+      }
+ 
+      if (sec.note)
+        h += `<div class="info-box">${xe(sec.note)}</div>`;
+ 
+      page.innerHTML = h;
+      main.appendChild(page);
+    });
+ 
+    // Afficher le site, cacher le login
+    document.getElementById('login-screen').style.display   = 'none';
+    document.getElementById('site-header').style.display    = 'flex';
+    document.getElementById('site-layout').style.display    = 'flex';
+  }
+ 
+  window.showPage = function (id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const p = document.getElementById('p-' + id);
+    const n = document.querySelector('.nav-item[data-id="' + id + '"]');
+    if (p) p.classList.add('active');
+    if (n) n.classList.add('active');
+    document.getElementById('main').scrollTop = 0;
+  };
+ 
+  window.toggleFaq = function (id) {
+    document.getElementById(id).classList.toggle('open');
+  };
+ 
+  function xe(s) {
+    if (s == null) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
